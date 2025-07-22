@@ -1,0 +1,60 @@
+/* Center everything on the page */
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #f4f4f4;
+}
+
+/* Wrapper for heading and back button */
+.header {
+  position: sticky;
+  top: 0;
+  background-color: #ffffff;
+  padding: 10px 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Back button style */
+.back-button {
+  position: absolute;
+  bottom: 15px;
+  left: 10px;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 6px;
+  background-image: linear-gradient(to right, #c7e9c0, #74c476);
+  color: #333;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* The main message box */
+.box {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  width: 400px;
+  max-height: 500px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+/* Message header */
+.box h2 {
+  margin-bottom: 10px;
+  text-align: center;
+  font-size: 20px;
+  color: #333;
+}
+
+

@@ -1,0 +1,54 @@
+.master-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f3f4f6; /* optional light background */
+}
+
+/* Gradient animated border wrapper */
+.wrapper {
+  padding: 2px; /* this is the border thickness */
+  border-radius: 14px;
+  background: linear-gradient(135deg, #c7e9c0, #74c476, #238b45, #c7e9c0);
+  background-size: 300% 300%;
+  animation: animated-border 5s ease infinite;
+  box-shadow: 0 0 15px #74c476aa;
+}
+
+/* Box styling */
+.master-box {
+  padding: 30px;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Animation keyframes */
+@keyframes animated-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Button style */
+.master-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(to right, #c7e9c0, #74c476);
+  cursor: pointer;
+}

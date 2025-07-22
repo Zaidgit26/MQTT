@@ -1,0 +1,125 @@
+/* Center container */
+.user-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f3f4f6;
+}
+
+/* Gradient animated border wrapper */
+.wrapper {
+  padding: 3px; /* this is the border thickness */
+  border-radius: 14px;
+  background: linear-gradient(135deg, #c7e9c0, #74c476, #238b45, #c7e9c0);
+  background-size: 300% 300%;
+  animation: animated-border 5s ease infinite;
+  box-shadow: 0 0 15px #74c476aa;
+}
+
+/* Box styling */
+.user-box {
+  background-color: white;
+  padding: 30px 20px;
+  border-radius: 14px;
+  width: 350px;
+  position: relative;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+/* Animation keyframes */
+@keyframes animated-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* Back button */
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 42px;
+  left: 16px;
+  background: linear-gradient(to right, #c7e9c0, #74c476);
+  width: 40px;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+/* Title */
+.form-title {
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 24px;
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+}
+
+/* Form styling */
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.user-form input {
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background-color: #f0f0f0;
+  font-size: 0.95rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Remove spinner arrows from number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+/* Gradient Login Button */
+.login-btn {
+  margin-top: 16px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(to right, #c7e9c0, #74c476);
+  color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.message {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+}

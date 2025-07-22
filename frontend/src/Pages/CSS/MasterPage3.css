@@ -1,0 +1,96 @@
+.container {
+  padding: 20px;
+}
+
+.wrapper {
+  padding: 4px; /* this is the border thickness */
+  border-radius: 14px;
+  background: linear-gradient(135deg, #c7e9c0, #74c476, #238b45, #c7e9c0);
+  background-size: 300% 300%;
+  animation: animated-border 5s ease infinite;
+  box-shadow: 0 0 15px #74c476aa;
+}
+
+.card {
+  border-radius: 10px;
+  padding: 30px 40px;
+  background-color: #fff;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+@keyframes animated-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  margin-bottom: 25px;
+}
+
+/* Optional: remove bold from h2 if needed */
+.header h2 {
+  font-size: 24px;
+  color: #2f2f2f;
+  margin: 0;
+}
+
+/* Smaller back button style */
+.top-back {
+  width: 40px;
+  height: 25px;
+  padding: 0;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input-field {
+  display: block;
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  border: none;
+  background: #f0f0f0;
+  font-size: 16px;
+  box-shadow: inset 0px 1px 3px rgba(0,0,0,0.1);
+}
+
+.buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  color: rgb(0, 0, 0);
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  background-image: linear-gradient(to right, #c7e9c0, #74c476);
+}
+
+.single-button {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+

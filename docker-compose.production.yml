@@ -1,0 +1,246 @@
+version: '3.8'
+
+services:
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: mqtt-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    networks:
+      - mqtt-network
+    depends_on:
+      - frontend
+      - backend
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # MongoDB Database with Replica Set
+  mongodb-primary:
+    image: mongo:7.0
+    container_name: mqtt-mongodb-primary
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME}
+      MONGO_REPLICA_SET_NAME: rs0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_primary_data:/data/db
+      - mongodb_primary_config:/data/configdb
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - mqtt-network
+    command: mongod --replSet rs0 --bind_ip_all
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # MQTT Broker Cluster
+  mosquitto-1:
+    image: eclipse-mosquitto:2.0
+    container_name: mqtt-broker-1
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+      - "9001:9001"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/auth:/mosquitto/auth:ro
+      - mosquitto_1_data:/mosquitto/data
+      - mosquitto_1_logs:/mosquitto/log
+    networks:
+      - mqtt-network
+    healthcheck:
+      test: ["CMD", "mosquitto_pub", "-h", "localhost", "-t", "test", "-m", "health_check"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend API (Multiple instances for load balancing)
+  backend-1:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mqtt-backend-1
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGO_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb-primary:27017/${MONGO_DB_NAME}?authSource=admin&replicaSet=rs0
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      MQTT_BROKER_URL: mqtt://mosquitto-1:1883
+      FRONTEND_URL: https://${DOMAIN_NAME}
+      LOG_LEVEL: ${LOG_LEVEL}
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - backend_1_logs:/app/logs
+    networks:
+      - mqtt-network
+    depends_on:
+      - mongodb-primary
+      - mosquitto-1
+      - redis
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  backend-2:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: mqtt-backend-2
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      MONGO_URI: mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongodb-primary:27017/${MONGO_DB_NAME}?authSource=admin&replicaSet=rs0
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN}
+      MQTT_BROKER_URL: mqtt://mosquitto-1:1883
+      FRONTEND_URL: https://${DOMAIN_NAME}
+      LOG_LEVEL: ${LOG_LEVEL}
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - backend_2_logs:/app/logs
+    networks:
+      - mqtt-network
+    depends_on:
+      - mongodb-primary
+      - mosquitto-1
+      - redis
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  # Frontend Web App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: https://${DOMAIN_NAME}/api
+    container_name: mqtt-frontend
+    restart: unless-stopped
+    networks:
+      - mqtt-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    container_name: mqtt-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - mqtt-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+        reservations:
+          memory: 128M
+
+  # Monitoring with Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: mqtt-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - mqtt-network
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+
+  # Grafana for visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: mqtt-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - mqtt-network
+    depends_on:
+      - prometheus
+
+volumes:
+  mongodb_primary_data:
+  mongodb_primary_config:
+  mosquitto_1_data:
+  mosquitto_1_logs:
+  backend_1_logs:
+  backend_2_logs:
+  redis_data:
+  nginx_logs:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  mqtt-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

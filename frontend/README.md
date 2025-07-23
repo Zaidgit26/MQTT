@@ -1,6 +1,31 @@
-# Getting Started with Create React App
+# Frontend for MQTT Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the frontend for the MQTT application, built with React. It provides a user interface to visualize data from MQTT devices and manage user accounts.
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v14 or later)
+- npm
+
+### Installation
+
+1. Clone the repository.
+2. Navigate to the `frontend` directory: `cd frontend`
+3. Install the dependencies: `npm install`
+
+### Environment Variables
+
+Create a `.env` file in the `frontend` directory and add the following environment variable to connect to the backend API:
+
+```
+REACT_APP_API_URL=http://localhost:5000/api
+```
+
+### Available Scripts
+
+In the project directory, you can run:
 
 ## Available Scripts
 

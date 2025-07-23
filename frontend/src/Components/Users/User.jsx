@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import './User.css';
 import { useNavigate } from 'react-router-dom';
+import { userAPI } from '../../services/api';
 
 const User = ( { searchTerm, visibleCount, onUserCountChange }) => {
 
@@ -10,10 +11,9 @@ const User = ( { searchTerm, visibleCount, onUserCountChange }) => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await fetch('http://localhost:5000/users');
-        const data = await response.json();
-        setUsers(data.users);
-        onUserCountChange(data.users.length);
+        const response = await userAPI.getUsers();
+        setUsers(response.data.users);
+        onUserCountChange(response.data.users.length);
       } catch (error) {
         console.error('Error fetching users:', error);
       }

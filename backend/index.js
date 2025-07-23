@@ -160,8 +160,6 @@ const authenticateToken = (req, res, next) => {
 
 // Database connection with proper error handling
 mongoose.connect(MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
   maxPoolSize: 10,
   serverSelectionTimeoutMS: 5000,
   socketTimeoutMS: 45000,
@@ -718,7 +716,7 @@ app.get('/devices', authenticateToken, async (req, res, next) => {
 app.use(errorHandler);
 
 // Handle 404 routes
-app.use('*', (req, res) => {
+app.use((req, res) => {
     res.status(404).json({
         message: 'Route not found',
         path: req.originalUrl,

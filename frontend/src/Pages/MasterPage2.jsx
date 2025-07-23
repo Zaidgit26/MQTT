@@ -1,10 +1,17 @@
 import React, { useState } from "react";
-import axios from "axios";
 import "./CSS/MasterPage2.css";
 import { useNavigate } from "react-router-dom";
+import { authAPI } from "../services/api";
 
 const MasterPage2 = () => {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear any stored data and navigate to login
+    sessionStorage.clear();
+    localStorage.clear();
+    navigate('/', { replace: true });
+  };
 
   const [formData, setFormData] = useState({
     deviceId: "",
@@ -25,10 +32,7 @@ const MasterPage2 = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post(
-        "http://localhost:5000/register",
-        formData
-      );
+      const response = await authAPI.register(formData);
       setMessage(response.data.message);
       setMessageType("success");
 
@@ -53,90 +57,95 @@ const MasterPage2 = () => {
 
   return (
     <div className="user-container">
-      <div className="wrapper">
-        <div className="user-box">
-          <button className="back-btn" onClick={() => navigate("/master")}>
-            ←
-          </button>
-          <h2 className="form-title">USER CREATION</h2>
-
-          {message && (
-            <div className={`message ${messageType}`}>
-              {message}
-            </div>
-          )}
-
-          <form className="user-form" onSubmit={handleRegister}>
-            <input
-              type="number"
-              placeholder="Device ID"
-              name="deviceId"
-              value={formData.deviceId}
-              onChange={handleChange}
-              required
-              onKeyDown={(e) => {
-                if (
-                  e.key === "e" ||
-                  e.key === "E" ||
-                  e.key === "+" ||
-                  e.key === "-" ||
-                  e.key === "."
-                ) {
-                  e.preventDefault();
-                }
-              }}
-            />
-            <input
-              type="password"
-              placeholder="Password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              placeholder="Consumer Name"
-              name="consumerName"
-              value={formData.consumerName}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              placeholder="Consumer Address"
-              name="consumerAddress"
-              value={formData.consumerAddress}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="number"
-              placeholder="Consumer No"
-              name="consumerNo"
-              value={formData.consumerNo}
-              onChange={handleChange}
-              required
-              onKeyDown={(e) => {
-                if (
-                  e.key === "e" ||
-                  e.key === "E" ||
-                  e.key === "+" ||
-                  e.key === "-" ||
-                  e.key === "."
-                ) {
-                  e.preventDefault();
-                }
-              }}
-            />
-
-            <button type="submit" className="login-btn">
-              Register
+        <div className="wrapper">
+          <div className="user-box">
+            <button className="back-btn" onClick={() => navigate("/master")}>
+              ←
             </button>
-          </form>
+            <h2 className="form-title">USER CREATION</h2>
+
+            {message && (
+              <div className={`message ${messageType}`}>
+                {message}
+              </div>
+            )}
+
+            <form className="user-form" onSubmit={handleRegister}>
+              <input
+                type="number"
+                placeholder="Device ID"
+                name="deviceId"
+                value={formData.deviceId}
+                onChange={handleChange}
+                required
+                onKeyDown={(e) => {
+                  if (
+                    e.key === "e" ||
+                    e.key === "E" ||
+                    e.key === "+" ||
+                    e.key === "-" ||
+                    e.key === "."
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Consumer Name"
+                name="consumerName"
+                value={formData.consumerName}
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Consumer Address"
+                name="consumerAddress"
+                value={formData.consumerAddress}
+                onChange={handleChange}
+                required
+              />
+              <input
+                type="number"
+                placeholder="Consumer No"
+                name="consumerNo"
+                value={formData.consumerNo}
+                onChange={handleChange}
+                required
+                onKeyDown={(e) => {
+                  if (
+                    e.key === "e" ||
+                    e.key === "E" ||
+                    e.key === "+" ||
+                    e.key === "-" ||
+                    e.key === "."
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+              />
+
+              <button type="submit" className="login-btn">
+                Register
+              </button>
+            </form>
+            <div className="logout-container">
+              <button className="logout-button" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
   );
 };
 

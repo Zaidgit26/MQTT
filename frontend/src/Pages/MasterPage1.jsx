@@ -6,6 +6,13 @@ const MasterPage1 = () => {
 
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    // Clear any stored data and navigate to login
+    sessionStorage.clear();
+    localStorage.clear();
+    navigate('/', { replace: true });
+  };
+
   return (
     <div className="master-container">
       <div className="wrapper">
@@ -13,7 +20,11 @@ const MasterPage1 = () => {
           <button className="master-btn" onClick={() => navigate('/usercreation')}>User Creation</button>
           <button className="master-btn" onClick={() => navigate('/devices')}>Devices</button>
           <button className="master-btn" onClick={() => navigate('/passwordreset')}>Password Reset</button>
-          <button className="master-btn logout" onClick={() => navigate('/')}>Logout</button>
+          <div className="logout-container">
+            <button className="logout-button" onClick={handleLogout}>
+              Logout
+            </button>
+          </div>
         </div>
       </div>
     </div>

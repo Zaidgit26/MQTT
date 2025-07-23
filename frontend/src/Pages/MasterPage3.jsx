@@ -1,10 +1,17 @@
 import React, { useState } from "react";
 import "./CSS/MasterPage3.css";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { authAPI } from "../services/api";
 
 const MasterPage3 = () => {
   const navigate = useNavigate();
+
+  const handleLogout = () => {
+    // Clear any stored data and navigate to login
+    sessionStorage.clear();
+    localStorage.clear();
+    navigate('/', { replace: true });
+  };
 
   const [consumerNo, setConsumerNo] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -20,7 +27,7 @@ const MasterPage3 = () => {
     }
 
     try {
-      const response = await axios.post("http://localhost:5000/resetpassword", {
+      const response = await authAPI.resetPassword({
         consumerNo,
         newPassword,
       });
@@ -47,45 +54,50 @@ const MasterPage3 = () => {
 
   return (
     <div className="container">
-      <div className="wrapper">
-        <div className="card">
-          <div className="header">
-            <button
-              className="btn top-back"
-              onClick={() => navigate("/master")}
-            >
-              ←
-            </button>
-            <h2>Password Reset</h2>
-          </div>
-
-          {message && (
-            <div className={`message ${messageType}`}>
-              {message}
+        <div className="wrapper">
+          <div className="card">
+            <div className="header">
+              <button
+                className="btn top-back"
+                onClick={() => navigate("/master")}
+              >
+                ←
+              </button>
+              <h2>Password Reset</h2>
             </div>
-          )}
 
-          <input
-            type="text"
-            placeholder="Consumer No"
-            className="input-field"
-            value={consumerNo}
-            onChange={(e) => setConsumerNo(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            className="input-field"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-          />
+            {message && (
+              <div className={`message ${messageType}`}>
+                {message}
+              </div>
+            )}
 
-          <div className="single-button">
-            <button className="btn reset" onClick={handleReset}>Reset</button>
+            <input
+              type="text"
+              placeholder="Consumer No"
+              className="input-field"
+              value={consumerNo}
+              onChange={(e) => setConsumerNo(e.target.value)}
+            />
+            <input
+              type="password"
+              placeholder="Password"
+              className="input-field"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+
+            <div className="single-button">
+              <button className="btn reset" onClick={handleReset}>Reset</button>
+            </div>
+            <div className="logout-container">
+              <button className="logout-button" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

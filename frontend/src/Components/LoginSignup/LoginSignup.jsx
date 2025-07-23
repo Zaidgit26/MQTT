@@ -31,6 +31,11 @@ const LoginSignup = () => {
         deviceId: user.deviceId
       }));
 
+      // Store device ID for MasterPage4 compatibility
+      if (user.deviceId && user.deviceId.length > 0) {
+        sessionStorage.setItem('userDeviceId', user.deviceId[0]);
+      }
+
       // Set axios default header for future requests
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     } catch (error) {
@@ -83,7 +88,7 @@ const LoginSignup = () => {
         password: password
       });
 
-      const { token, user, expiresIn } = response.data;
+      const { token, user } = response.data;
 
       if (!token || !user) {
         throw new Error('Invalid response from server');
